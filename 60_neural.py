@@ -29,6 +29,7 @@ class Net(nn.Module):
 
     def num_flat_features(self, x):
         size = x.size()[1:]  # all dimensions except the batch dimension
+
         num_features = 1
         for s in size:
             num_features *= s
@@ -42,8 +43,39 @@ params = list(net.parameters())
 
 input = Variable(torch.randn(1, 1, 32, 32))
 out = net(input)
-print(out)
 
 net.zero_grad()
 out.backward(torch.randn(1, 10))
 
+output = net(input)
+target = Variable(torch.arange(1, 11))
+criterion = nn.MSELoss()
+loss = criterion(output, target)
+
+# print(loss)
+# print(loss.creator) # MSELoss
+# print(loss.creator.previous_functions[0][0]) # Linear
+# print(loss.creator.previous_functions[0][0].previous_functions[0][0]) # ReLU
+#
+# net.zero_grad()
+# print('conv1.bias.grad before backward')
+# print(net.conv1.bias.grad)
+# loss.backward()
+# print('conv1.bias.grad after backward')
+# print(net.conv1.bias.grad)
+
+
+learning_rate = 0.01
+for f in net.parameters():
+    f.data.sub_(f.grad.data * learning_rate)
+
+import torch.optim as optim
+# create your optimizer
+optimizer = optim.SGD(net.parameters(), lr = 0.01)
+
+# in your training loop:
+optimizer.zero_grad() # zero the gradient buffers
+output = net(input)
+loss = criterion(output, target)
+loss.backward()
+optimizer.step() # Does the update
