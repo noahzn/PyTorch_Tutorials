@@ -1,8 +1,3 @@
-
-# coding: utf-8
-
-# In[6]:
-
 import torch
 from torch.autograd import Variable
 import torch.nn as nn
