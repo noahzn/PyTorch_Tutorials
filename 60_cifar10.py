@@ -2,6 +2,7 @@ import torch
 import torch.utils.data
 import torchvision
 import torchvision.transforms as transforms
+import os
 
 
 transform = transforms.Compose([transforms.ToTensor(),
@@ -56,44 +57,49 @@ class Net(nn.Module):
         return x
 
 
-net = Net()
-net.cuda()
+if not os.path.exists('net.kpl'):
+    net = Net()
+    net.cuda()
+    import torch.optim as optim
+
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 
-import torch.optim as optim
+    # start training
+    for epoch in range(2):  # loop over the dataset multiple times
 
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+        running_loss = 0.0
+        for i, data in enumerate(trainloader, 0):
+            # get the inputs
+            inputs, labels = data
 
+            # wrap them in Variable
+            inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
 
-# start training
-for epoch in range(2):  # loop over the dataset multiple times
+            # zero the parameter gradients
+            optimizer.zero_grad()
 
-    running_loss = 0.0
-    for i, data in enumerate(trainloader, 0):
-        # get the inputs
-        inputs, labels = data
+            # forward + backward + optimize
+            outputs = net(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
 
-        # wrap them in Variable
-        inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
+            # print statistics
+            running_loss += loss.data[0]
+            if i % 2000 == 1999:    # print every 2000 mini-batches
+                print('[%d, %5d] loss: %.3f' %
+                      (epoch + 1, i + 1, running_loss / 2000))
+                running_loss = 0.0
 
-        # zero the parameter gradients
-        optimizer.zero_grad()
+    print('Finished Training')
+    torch.save(net, 'net.kpl')
 
-        # forward + backward + optimize
-        outputs = net(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
+else:
+    net = torch.load('net.kpl')
+    net.cuda()
 
-        # print statistics
-        running_loss += loss.data[0]
-        if i % 2000 == 1999:    # print every 2000 mini-batches
-            print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 2000))
-            running_loss = 0.0
-
-print('Finished Training')
 
 
 # dataiter = iter(testloader)
