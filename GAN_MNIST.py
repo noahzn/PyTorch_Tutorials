@@ -30,6 +30,7 @@ class D(nn.Module):
         self.fc3 = nn.Linear(240, 1)
 
     def forward(self, x):
+        input(x.size())
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = F.sigmoid(self.fc3(x))
@@ -97,7 +98,7 @@ for epoch in range(200):
         if (i + 1) % 300 == 0:
             print('Epoch [%d/%d], Step[%d/%d], d_loss: %.4f, g_loss: %.4f, '
                   'D(x): %.2f, D(G(z)): %.2f'
-                  % (epoch, 200, i + 1, 600, D_loss.data[0], G_loss.data[0],
+                  % (epoch, 50, i + 1, 600, D_loss.data[0], G_loss.data[0],
                      real_score.data.mean(), fake_score.cpu().data.mean()))
 
     fake_images = fake_images.view(fake_images.size(0), 1, 28, 28)
