@@ -30,7 +30,6 @@ class D(nn.Module):
         self.fc3 = nn.Linear(240, 1)
 
     def forward(self, x):
-        input(x.size())
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = F.sigmoid(self.fc3(x))
@@ -46,6 +45,7 @@ class G(nn.Module):
         self.fc3 = nn.Linear(200, 784)
 
     def forward(self, x):
+
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = F.tanh(self.fc3(x))

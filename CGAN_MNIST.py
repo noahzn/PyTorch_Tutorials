@@ -47,7 +47,9 @@ class G(nn.Module):
         self.fc3 = nn.Linear(128, 784)
 
     def forward(self, x, y):
+
         x = torch.cat([x, y], 1)
+        input(x)
         x = F.relu(self.fc1(x))
         #x = F.relu(self.fc2(x))
         x = F.sigmoid(self.fc3(x))
@@ -89,6 +91,7 @@ for epoch in range(100):
         Discriminator.zero_grad()
 
         noise = Variable(torch.randn(images.size(0), 100).cuda())
+
 
         fake_images = Generator(noise, labels).detach()
         real_score = Discriminator(images, labels)

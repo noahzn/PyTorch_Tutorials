@@ -76,7 +76,7 @@ class Generator(nn.Module):
         )
 
     def forward(self, x):
-        input(self.net.ConvTranspose2d(x))
+        input(x)
         # print('x ', x.size())
         x = x.view(x.size(0), 128, 1, 1)
         out = self.net(x)
